@@ -1,21 +1,20 @@
-importScripts('/src/js/idb.js');
-importScripts('/src/js/utility.js');
+importScripts('/public/src/js/idb.js');
+importScripts('/public/src/js/utility.js');
 
 var CACHE_STATIC_NAME = 'static-v22';
 var CACHE_DYNAMIC_NAME = 'dynamic-v2';
 var STATIC_FILES = [
-  '/',
-  '/index.html',
-  '/offline.html',
-  '/src/js/app.js',
-  '/src/js/feed.js',
-  '/src/js/idb.js',
-  '/src/js/promise.js',
-  '/src/js/fetch.js',
-  '/src/js/material.min.js',
-  '/src/css/app.css',
-  '/src/css/feed.css',
-  '/src/images/main-image.jpg',
+  '/public/index.html',
+  '/public/offline.html',
+  '/public/src/js/app.js',
+  '/public/src/js/feed.js',
+  '/public/src/js/idb.js',
+  '/public/src/js/promise.js',
+  '/public/src/js/fetch.js',
+  '/public/src/js/material.min.js',
+  '/public/src/css/app.css',
+  '/public/src/css/feed.css',
+  '/public/src/images/main-image.jpg',
   'https://fonts.googleapis.com/css?family=Roboto:400,700',
   'https://fonts.googleapis.com/icon?family=Material+Icons',
   'https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css'
@@ -74,7 +73,7 @@ function isInArray(string, array) {
 
 self.addEventListener('fetch', function (event) {
 
-  var url = 'https://pwagram-99adf.firebaseio.com/posts';
+  var url = 'https://pwa-advanced.firebaseio.com/posts';
   if (event.request.url.indexOf(url) > -1) {
     event.respondWith(fetch(event.request)
       .then(function (res) {
@@ -115,7 +114,7 @@ self.addEventListener('fetch', function (event) {
                 return caches.open(CACHE_STATIC_NAME)
                   .then(function (cache) {
                     if (event.request.headers.get('accept').includes('text/html')) {
-                      return cache.match('/offline.html');
+                      return cache.match('/public/offline.html');
                     }
                   });
               });

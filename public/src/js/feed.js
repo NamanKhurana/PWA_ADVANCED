@@ -50,7 +50,7 @@ function onSaveButtonClicked(event) {
     caches.open('user-requested')
       .then(function(cache) {
         cache.add('https://httpbin.org/get');
-        cache.add('/src/images/sf-boat.jpg');
+        cache.add('/public/src/images/sf-boat.jpg');
       });
   }
 }
@@ -94,7 +94,7 @@ function updateUI(data) {
   }
 }
 
-var url = 'https://pwagram-99adf.firebaseio.com/posts.json';
+var url = 'https://pwa-advanced.firebaseio.com/posts.json';
 var networkDataReceived = false;
 
 fetch(url)
