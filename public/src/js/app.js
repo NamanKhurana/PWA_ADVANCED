@@ -23,32 +23,77 @@ window.addEventListener('beforeinstallprompt', function (event) {
   return false;
 });
 
-function displayConfirmNotification(){
+function displayConfirmNotification() {
 
-  if('serviceWorker' in navigator){
+  if ('serviceWorker' in navigator) {
 
     var options = {
-      body:'You successfully subscribed to our notification service',
-      icon:'../images/icons/app-icon-96x96.png',
-      image:'../images/sf-boat.jpg',
-      dir:'ltr',
-      lang:'en-US',
-      vibrate:[100,50,200],
-      badge:'../images/icons/app-icon-96x96.png',
-      tag:'confirm-notification',
-      renotify:'true',
-      actions:[
-        {action:'confirm',title:'Okay',icon:'../images/icons/app-icon-96x96.png'},
-        {action:'cancel',title:'Cancel',icon:'../images/icons/app-icon-96x96.png'}
+      body: 'You successfully subscribed to our notification service',
+      icon: '../images/icons/app-icon-96x96.png',
+      image: '../images/sf-boat.jpg',
+      dir: 'ltr',
+      lang: 'en-US',
+      vibrate: [100, 50, 200],
+      badge: '../images/icons/app-icon-96x96.png',
+      tag: 'confirm-notification',
+      renotify: 'true',
+      actions: [
+        { action: 'confirm', title: 'Okay', icon: '../images/icons/app-icon-96x96.png' },
+        { action: 'cancel', title: 'Cancel', icon: '../images/icons/app-icon-96x96.png' }
       ]
     }
 
     navigator.serviceWorker.ready
-    .then(function(swreg){
-    swreg.showNotification('Successfully Subscribed (from SW)',options)
-    })
+      .then(function (swreg) {
+        swreg.showNotification('Successfully Subscribed', options)
+      })
   }
 
+}
+
+function configurePushSub() {
+
+  if (!('serviceWorker' in navigator)) {
+    return;
+  }
+
+  var reg;
+  navigator.serviceWorker.ready
+    .then(function (swreg) {
+      reg = swreg
+      return swreg.pushManager.getSubscription()
+    })
+    .then(function (sub) {
+      if (sub === null) {
+        //Create a new subscription
+        var vapidPublicKey = 'BMD3xgTDOcE1nI2DzxuGZKoForhZgTtI_Gf2RE7RBD2Rwo7BIS9CD_bMwEaJtXFCL0miDfBVSVTler66xFuTLog'
+        var convertedVapidPublicKey = urlBase64ToUint8Array(vapidPublicKey)
+        reg.pushManager.subscribe({
+         userVisibleOnly:true,
+         applicationServerKey:convertedVapidPublicKey
+        })
+      } else {
+        //We have a subscription
+      }
+    })
+    .then(function(newSub){
+     return fetch("https://pwa-advanced.firebaseio.com/subscriptions.json",{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Accept':'application/json'
+        },
+        body:JSON.stringify(newSub)
+      })
+    })
+    .then(function(res){
+      if(res.ok){
+        displayConfirmNotification()
+      }
+    })
+    .catch(function(err){
+      console.log(err)
+    })
 }
 
 function askForNotificationPermission() {
@@ -57,12 +102,13 @@ function askForNotificationPermission() {
     if (result !== 'granted') {
       console.log('No Notificaion permission granted')
     } else {
-        displayConfirmNotification()
+      // displayConfirmNotification()
+      configurePushSub()
     }
   })
 }
 
-if ('Notification' in window) {
+if ('Notification' in window && 'serviceWorker' in navigator) {
   for (var i = 0; i < enableNotificationButtons.length; i++) {
     enableNotificationButtons[i].style.display = 'inline-block'
     enableNotificationButtons[i].addEventListener('click', askForNotificationPermission)

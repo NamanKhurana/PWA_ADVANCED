@@ -124,6 +124,7 @@ self.addEventListener('fetch', function (event) {
   }
 });
 
+
 // self.addEventListener('fetch', function(event) {
 //   event.respondWith(
 //     caches.match(event.request)
@@ -180,13 +181,13 @@ self.addEventListener('fetch', function (event) {
 //   );
 // });
 
-self.addEventListener('sync', function (event) {
-  console.log('[Service Worker] Background Syncing', event)
+self.addEventListener('sync', function(event) {
+  console.log('[Service Worker] Background syncing', event);
   if (event.tag === 'sync-new-posts') {
-    console.log('[Service Worker] Syncing new posts')
+    console.log('[Service Worker] Syncing new Posts');
     event.waitUntil(
       readAllData('sync-posts')
-        .then(function (data) {
+        .then(function(data) {
           for (var dt of data) {
             fetch('https://us-central1-pwa-advanced.cloudfunctions.net/storePostData', {
               method: 'POST',
@@ -198,38 +199,46 @@ self.addEventListener('sync', function (event) {
                 id: dt.id,
                 title: dt.title,
                 location: dt.location,
-                image: "https://firebasestorage.googleapis.com/v0/b/pwa-advanced.appspot.com/o/sf-boat.jpg?alt=media&token=5c5432a8-0842-4bc2-bf48-c25b061309aa"
+                image: 'https://firebasestorage.googleapis.com/v0/b/pwa-advanced.appspot.com/o/sf-boat.jpg?alt=media&token=5c5432a8-0842-4bc2-bf48-c25b061309aa'
               })
             })
-              .then(function (res) {
-                console.log('Sent data', res)
+              .then(function(res) {
+                console.log('Sent data', res);
                 if (res.ok) {
                   res.json()
-                    .then(function (resData) {
-                      deleteItemFromData('sync-posts', resData.id)
-                    })
+                    .then(function(resData) {
+                      deleteItemFromData('sync-posts', resData.id);
+                    });
                 }
               })
-              .catch(function (err) {
-                console.log("Error while sending the data", err)
-              })
+              .catch(function(err) {
+                console.log('Error while sending data', err);
+              });
           }
+
         })
-    )
+    );
   }
-})
+});
 
-self.addEventListener('notificationclick', function (event) {
-  var notification = event.notification
-  var action = event.action
+self.addEventListener('notificationclick', function(event) {
+  var notification = event.notification;
+  var action = event.action;
 
-  console.log(notification)
+  console.log(notification);
 
   if (action === 'confirm') {
-    console.log('Confirm was chosen')
-    notification.close()
+    console.log('Confirm was chosen');
+    notification.close();
   } else {
-    console.log(action)
+    console.log(action);
+    notification.close();
   }
+});
 
-})
+self.addEventListener('notificationclose', function(event) {
+  console.log('Notification was closed', event);
+});
+
+
+
