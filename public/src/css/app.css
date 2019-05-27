@@ -5,3 +5,8 @@
 .drawer-option {
   padding: 16px;
 }
+
+.enable-notifications
+{
+  display:none;
+}
